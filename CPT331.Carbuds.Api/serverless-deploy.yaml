@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  An AWS Serverless Application that uses the ASP.NET Core framework running in
+  Amazon Lambda.
+
+Globals:
+  Api:
+    Cors: 
+      AllowOrigin: "'*'"
+      AllowHeaders: "'*'"
+
+Parameters:
+  AspNetCoreEnv:
+    Type: String
+    Default: Development
+  UserpoolArn:
+    Type: String
+    Default: arn:aws:cognito-idp:ap-southeast-2:869393488965:userpool/ap-southeast-2_AqzplwcCO
+
+Resources:
+
+  AuthrApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Dev
+      Auth:
+        DefaultAuthorizer: CognitoUserPool
+        Authorizers:
+          CognitoUserPool:
+            UserPoolArn: !Ref UserpoolArn
+        AddDefaultAuthorizerToCorsPreflight: false
+
+  AspNetCoreApi:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: CPT331.Carbuds.Api::CPT331.Carbuds.Api.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnetcore3.1
+      CodeUri: ''
+      MemorySize: 1024
+      Timeout: 30
+      Role: null
+      Policies:
+        - AWSLambdaFullAccess
+        - AWSLambdaDynamoDBExecutionRole
+        - Statement:
+          - Sid: SSMParametersPolicy
+            Effect: Allow
+            Action:
+            - ssm:GetParameter
+            - ssm:GetParameters
+            - ssm:GetParametersByPath
+            Resource: '*'
+      Environment:
+        Variables:
+          ASPNETCORE_ENVIRONMENT: !Ref AspNetCoreEnv
+      Events:
+
+        #------------- Auth -------------
+        AuthLogin:
+          Type: Api
+          Properties:
+            Path: '/api/auth/login'
+            Method: Post
+            RestApiId: !Ref "AuthrApi" 
+            Auth: 
+              Authorizer: 'NONE'
+
+Outputs:
+  ApiURL:
+    Description: raw API endpoint URL for this environment
+    Value: !Sub 'https://${AuthrApi}.execute-api.${AWS::Region}.amazonaws.com/Dev/'
