@@ -30,6 +30,7 @@ namespace CPT331.Carbuds.Api
       services.AddControllers();
 
       services.AddAWSService<Amazon.DynamoDBv2.IAmazonDynamoDB>();
+      services.AddAWSService<Amazon.CognitoIdentityProvider.IAmazonCognitoIdentityProvider>();
 
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
