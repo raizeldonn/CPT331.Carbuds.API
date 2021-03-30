@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 namespace CPT331.Carbuds.Api.Contracts.Car
 {
-  public class GetListCarsResponse: BaseResponse
+  public class PostAddUpdateCarResponse: BaseResponse
   {
-    public List<CPT331.Carbuds.Api.Models.Car.Car> Cars { get; set; }
   }
 }
