@@ -90,7 +90,7 @@ Resources:
         - AttributeName: Uuid
           AttributeType: S
       KeySchema:
-        - AttributeName: Domain
+        - AttributeName: Uuid
           KeyType: HASH
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
@@ -100,4 +100,4 @@ Resources:
 Outputs:
   ApiURL:
     Description: raw API endpoint URL for this environment
-    Value: !Sub 'https://${}.execute-api.${AWS::Region}.amazonaws.com/Dev/'
+    Value: !Sub 'https://${CarbudsApi}.execute-api.${AWS::Region}.amazonaws.com/Dev/'
