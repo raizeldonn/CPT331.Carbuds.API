@@ -34,8 +34,9 @@ namespace CPT331.Carbuds.Api
 
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
+      services.AddSingleton<ISignupService, SignupService>();
 
-    }
+        }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
