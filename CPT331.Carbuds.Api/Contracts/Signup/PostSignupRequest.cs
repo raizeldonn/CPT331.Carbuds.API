@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CPT331.Carbuds.Api.Contracts.Signup
 {
-  public class PostCreateUserRequest
+  public class PostSignupRequest
   {
         public string Email { get; set; }
         public string Password { get; set; }

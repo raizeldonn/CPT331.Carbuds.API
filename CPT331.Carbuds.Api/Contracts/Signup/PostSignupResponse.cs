@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CPT331.Carbuds.Api.Contracts.Signup
 {
-  public class PostCreateUserResponse: BaseResponse
+  public class PostSignupResponse: BaseResponse
   {
     public bool isSuccess { get; set; }
   }

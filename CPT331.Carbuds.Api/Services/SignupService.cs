@@ -10,7 +10,7 @@ namespace CPT331.Carbuds.Api.Services
 {
   public interface ISignupService
   {
-    Task<AdminCreateUserResponse> CreateUser(string Password, string Name, string Username, string email);
+    Task<SignUpResponse> Signup(string Password, string Name, string Username, string email, string clientId);
   }
 
   public class SignupService: ISignupService
@@ -24,12 +24,13 @@ namespace CPT331.Carbuds.Api.Services
       _cognito = cognito;
     }
 
-    public async Task<AdminCreateUserResponse> CreateUser(string password, string username, string name, string email)
+    public async Task<SignUpResponse> Signup(string password, string username, string name, string email, string clientId = null)
     {
-        var CreateUserRequest = new AdminCreateUserRequest
+        var SignupRequest = new SignUpRequest
         {
-            UserPoolId = _config.GetValue<string>("Cognito:UserPoolId"),
-            TemporaryPassword = password,
+            ClientId = string.IsNullOrEmpty(clientId) ? _config.GetValue<string>("Cognito:AppClientId") : clientId,
+            //ClientId = "1btr18nik21i9fn341cou475tg",
+            Password = password,
             Username = username,
         };
         var nameAttribute = new AttributeType
@@ -40,14 +41,14 @@ namespace CPT331.Carbuds.Api.Services
         var emailAttribute = new AttributeType
         {
             Name = "email",
-            Value = name
+            Value = email
         };
-            CreateUserRequest.UserAttributes.Add(nameAttribute);
-            CreateUserRequest.UserAttributes.Add(emailAttribute);
+            SignupRequest.UserAttributes.Add(nameAttribute);
+            SignupRequest.UserAttributes.Add(emailAttribute);
 
             try
         {
-            var response = await _cognito.AdminCreateUserAsync(CreateUserRequest);
+            var response = await _cognito.SignUpAsync(SignupRequest);
             return response;
         }
         catch (Exception e)

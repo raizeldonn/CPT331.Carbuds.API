@@ -21,12 +21,12 @@ namespace CPT331.Carbuds.Api.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<PostCreateUserResponse> CreateUser(PostCreateUserRequest request)
+        public async Task<PostSignupResponse> CreateUser(PostSignupRequest request)
         {
             try
             {
-                var result = await _signupService.CreateUser(request.Email, request.Username, request.Password, request.Name);
-                return new PostCreateUserResponse()
+                var result = await _signupService.Signup(request.Email, request.Username, request.Password, request.Name, null);
+                return new PostSignupResponse()
                 {
                     isSuccess = true
                 };
@@ -34,7 +34,7 @@ namespace CPT331.Carbuds.Api.Controllers
             }
             catch (Exception e)
             {
-                return new PostCreateUserResponse()
+                return new PostSignupResponse()
                 {
                     isSuccess = false
                 };
