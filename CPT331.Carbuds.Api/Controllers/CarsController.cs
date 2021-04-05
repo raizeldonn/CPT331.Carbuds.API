@@ -48,6 +48,7 @@ namespace CPT331.Carbuds.Api.Controllers
       {
         return new GetListCarsResponse()
         {
+          Success = true,
           Cars = await _carService.ListAllCars()
         };
       }
