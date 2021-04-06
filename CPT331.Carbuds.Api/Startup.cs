@@ -34,10 +34,10 @@ namespace CPT331.Carbuds.Api
 
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
-      services.AddSingleton<ISignupService, SignupService>();
+      services.AddSingleton<IUserService, UserService>();
       services.AddSingleton<ICarService, CarService>();
 
-        }
+    }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -58,8 +58,8 @@ namespace CPT331.Carbuds.Api
         endpoints.MapControllers();
         endpoints.MapGet("/", async context =>
               {
-            await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
-          });
+                await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+              });
       });
     }
   }

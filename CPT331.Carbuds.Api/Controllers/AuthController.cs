@@ -21,7 +21,7 @@ namespace CPT331.Carbuds.Api.Controllers
       _authService = authService;
     }
 
-        [HttpPost("login")]
+    [HttpPost("login")]
     public async Task<PostLoginResponse> Login(PostLoginRequest request)
     {
 
@@ -45,7 +45,5 @@ namespace CPT331.Carbuds.Api.Controllers
       }
 
     }
-
-
   }
 }
