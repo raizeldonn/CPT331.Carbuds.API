@@ -35,6 +35,7 @@ namespace CPT331.Carbuds.Api
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
       services.AddSingleton<ISignupService, SignupService>();
+      services.AddSingleton<ICarService, CarService>();
 
         }
 

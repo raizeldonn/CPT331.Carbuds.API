@@ -70,13 +70,19 @@ namespace CPT331.Carbuds.Api.Services
           case "long":
             propertyValue = new AttributeValue()
             {
-              N = (string)prop.GetValue(obj)
+              N = prop.GetValue(obj).ToString()
             };
             break;
           case "float":
             propertyValue = new AttributeValue()
             {
-              N = (string)prop.GetValue(obj)
+              N = prop.GetValue(obj).ToString()
+            };
+            break;
+          case "decimal":
+            propertyValue = new AttributeValue()
+            {
+              N = prop.GetValue(obj).ToString()
             };
             break;
           case "bool":

@@ -20,7 +20,7 @@ Parameters:
 
 Resources:
 
-  AuthrApi:
+  CarbudsApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Dev
@@ -41,8 +41,9 @@ Resources:
       Timeout: 30
       Role: null
       Policies:
-        - AWSLambdaFullAccess
+        - AWSLambda_FullAccess
         - AWSLambdaDynamoDBExecutionRole
+        - AmazonDynamoDBFullAccess
         - Statement:
           - Sid: SSMParametersPolicy
             Effect: Allow
@@ -62,11 +63,41 @@ Resources:
           Properties:
             Path: '/api/auth/login'
             Method: Post
-            RestApiId: !Ref "AuthrApi" 
-            Auth: 
-              Authorizer: 'NONE'
+            RestApiId: !Ref "CarbudsApi" 
+
+        #------------- Cars -------------
+        CarsAddUpdateCar:
+          Type: Api
+          Properties:
+            Path: '/api/cars'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+
+        CarsListAllCars:
+          Type: Api
+          Properties:
+            Path: '/api/cars/list'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi" 
+
+  # ---------------- DYNAMO TABLE DEFINITIONS ----------------
+  
+  CarsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Uuid
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-cars
 
 Outputs:
   ApiURL:
     Description: raw API endpoint URL for this environment
-    Value: !Sub 'https://${AuthrApi}.execute-api.${AWS::Region}.amazonaws.com/Dev/'
+    Value: !Sub 'https://${CarbudsApi}.execute-api.${AWS::Region}.amazonaws.com/Dev/'
