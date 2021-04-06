@@ -34,6 +34,7 @@ namespace CPT331.Carbuds.Api
 
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
+      services.AddSingleton<IUserService, UserService>();
       services.AddSingleton<ICarService, CarService>();
 
     }
@@ -57,8 +58,8 @@ namespace CPT331.Carbuds.Api
         endpoints.MapControllers();
         endpoints.MapGet("/", async context =>
               {
-            await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
-          });
+                await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+              });
       });
     }
   }
