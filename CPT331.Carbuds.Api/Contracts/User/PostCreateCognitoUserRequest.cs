@@ -9,5 +9,9 @@ namespace CPT331.Carbuds.Api.Contracts.User
   {
     public string Email { get; set; }
     public string Password { get; set; }
+    public string Name { get; set; }
+    public string CardNumber { get; set; }
+    public string CardExpiry { get; set; }
+    public string CardCvv { get; set; }
   }
 }

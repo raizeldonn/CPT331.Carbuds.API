@@ -97,6 +97,21 @@ Resources:
         WriteCapacityUnits: 2
       TableName: carbuds-cars
 
+  UserProfilesTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Email
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-userProfiles
+
 Outputs:
   ApiURL:
     Description: raw API endpoint URL for this environment

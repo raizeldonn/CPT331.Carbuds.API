@@ -1,6 +1,9 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 using CPT331.Carbuds.Api.Contracts.User;
+using CPT331.Carbuds.Api.Models.User;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -18,11 +21,15 @@ namespace CPT331.Carbuds.Api.Services
   {
     private readonly IAmazonCognitoIdentityProvider _cognito;
     private IConfiguration _config;
+    private IAmazonDynamoDB _dynamoDb;
+    private IUtilityService _utils;
 
-    public UserService(IAmazonCognitoIdentityProvider cognito, IConfiguration config)
+    public UserService(IAmazonCognitoIdentityProvider cognito, IConfiguration config, IAmazonDynamoDB dynamoDb, IUtilityService utils)
     {
       _cognito = cognito;
       _config = config;
+      _dynamoDb = dynamoDb;
+      _utils = utils;
     }
 
     public async Task<bool> CreateCognitoUser(PostCreateCognitoUserRequest request)
@@ -59,13 +66,21 @@ namespace CPT331.Carbuds.Api.Services
       };
       var addComplete = await _cognito.AdminAddUserToGroupAsync(addToGroupReq);
 
-      var pwSet = await SetCognitoUserPassword(request.Email, request.Password);      
+      var pwSet = await SetCognitoUserPassword(request.Email, request.Password);
 
-      //todo- create a blank user profile here maybe?
+      UserProfile newUserProfile = new UserProfile()
+      {
+        Email = request.Email,
+        Name = request.Name,
+        PaymentCardNumber = request.CardNumber,
+        PaymentCardCvv = request.CardCvv,
+        PaymentCardExpiry = request.CardExpiry
+      };
+
+      var profileCreated = await AddUpdateUserProfile(newUserProfile);
 
       return true;
     }
-
 
     public async Task<bool> SetCognitoUserPassword(string userEmail, string newPassword)
     {
@@ -78,6 +93,17 @@ namespace CPT331.Carbuds.Api.Services
       };
 
       var setPw = await _cognito.AdminSetUserPasswordAsync(confirmPw);
+      return true;
+    }
+
+    public async Task<bool> AddUpdateUserProfile(UserProfile profile)
+    {
+      var putReq = new PutItemRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:UserProfiles"),
+        Item = _utils.ToDynamoAttributeValueDictionary<UserProfile>(profile)
+      };
+      var response = await _dynamoDb.PutItemAsync(putReq);
       return true;
     }
   }
