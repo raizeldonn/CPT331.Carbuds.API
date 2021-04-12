@@ -15,7 +15,8 @@ namespace CPT331.Carbuds.Api.Services
   public interface IUserService
   {
     Task<bool> CreateCognitoUser(PostCreateCognitoUserRequest request);
-  }
+    Task<UserProfile> GetUserInfo(string userId);
+    }
 
   public class UserService: IUserService
   {
@@ -106,5 +107,25 @@ namespace CPT331.Carbuds.Api.Services
       var response = await _dynamoDb.PutItemAsync(putReq);
       return true;
     }
-  }
+
+        public async Task<UserProfile> GetUserInfo(string userEmail)
+        {
+
+            Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+            {
+            { "Email", new AttributeValue { S = userEmail } },
+            };
+
+            GetItemRequest itemReq = new GetItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:UserProfiles"),
+                Key = key
+            };
+
+            var dbResult = await _dynamoDb.GetItemAsync(itemReq);
+            var user = _utils.ToObjectFromDynamoResult<UserProfile>(dbResult.Item);
+
+            return user;
+        }
+    }
 }
