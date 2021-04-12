@@ -7,11 +7,9 @@ namespace CPT331.Carbuds.Api.Models.ParkingLocation
 {
     public class ParkingLocation
     {
-        public string Location { get; set; }
+        public string Uuid { get; set; }
         public string FriendlyName { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
-        public int Postcode { get; set; }
-        public string State { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
     }
 }
