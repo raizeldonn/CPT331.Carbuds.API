@@ -155,6 +155,9 @@ namespace CPT331.Carbuds.Api.Services
             case "double":
               prop.SetValue(returnObj, Convert.ToDouble(dynamoObjValue.S));
               break;
+            case "decimal":
+              prop.SetValue(returnObj, Convert.ToDecimal(dynamoObjValue.N));
+              break;
             case "boolean":
               prop.SetValue(returnObj, dynamoObjValue.BOOL);
               break;
