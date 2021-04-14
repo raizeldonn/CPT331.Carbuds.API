@@ -15,7 +15,7 @@ namespace CPT331.Carbuds.Api.Controllers
   public class UsersController : ControllerBase
   {
     private IUserService _userService;
-    
+   
     public UsersController(IUserService userService)
     {
       _userService = userService;
@@ -24,7 +24,6 @@ namespace CPT331.Carbuds.Api.Controllers
     [HttpGet("{email}")]
     public async Task<GetUserResponse> GetUserInfo(string email)
     {
-
         try
         {
             return new GetUserResponse()
