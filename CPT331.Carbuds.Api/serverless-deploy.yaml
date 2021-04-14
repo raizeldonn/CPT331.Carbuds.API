@@ -97,6 +97,63 @@ Resources:
         WriteCapacityUnits: 2
       TableName: carbuds-cars
 
+  UserProfilesTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Email
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-userProfiles
+
+  ParkingLocationsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Uuid
+          AttributeType: S
+        - AttributeName: Longitude
+          AttributeType: N
+        - AttributeName: Latitude
+          AttributeType: N
+      KeySchema:
+        - AttributeName: Uuid
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: LongitudeIndex
+          KeySchema:
+          - AttributeName: Longitude
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+        - IndexName: LatitudeIndex
+          KeySchema:
+          - AttributeName: Latitude
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-parkingLocations
+
 Outputs:
   ApiURL:
     Description: raw API endpoint URL for this environment

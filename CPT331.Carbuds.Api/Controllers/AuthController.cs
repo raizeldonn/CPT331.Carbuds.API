@@ -45,7 +45,5 @@ namespace CPT331.Carbuds.Api.Controllers
       }
 
     }
-
-
   }
 }

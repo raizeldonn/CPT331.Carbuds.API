@@ -14,7 +14,4 @@
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ namespace CPT331.Carbuds.Api.Services
   public interface IAuthService
   {
     Task<AuthenticationResultType> Login(string username, string password, string clientId = null);
-  }
+    }
 
   public class AuthService: IAuthService
   {
@@ -53,5 +53,5 @@ namespace CPT331.Carbuds.Api.Services
         //todo - specific exception handling based on the type of exception here
       }
     }
-  }
+    }
 }

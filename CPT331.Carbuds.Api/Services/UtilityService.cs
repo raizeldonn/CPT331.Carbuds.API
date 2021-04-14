@@ -70,13 +70,19 @@ namespace CPT331.Carbuds.Api.Services
           case "long":
             propertyValue = new AttributeValue()
             {
-              N = (string)prop.GetValue(obj)
+              N = prop.GetValue(obj).ToString()
             };
             break;
           case "float":
             propertyValue = new AttributeValue()
             {
-              N = (string)prop.GetValue(obj)
+              N = prop.GetValue(obj).ToString()
+            };
+            break;
+          case "decimal":
+            propertyValue = new AttributeValue()
+            {
+              N = prop.GetValue(obj).ToString()
             };
             break;
           case "bool":
@@ -148,6 +154,9 @@ namespace CPT331.Carbuds.Api.Services
               break;
             case "double":
               prop.SetValue(returnObj, Convert.ToDouble(dynamoObjValue.S));
+              break;
+            case "decimal":
+              prop.SetValue(returnObj, Convert.ToDecimal(dynamoObjValue.N));
               break;
             case "boolean":
               prop.SetValue(returnObj, dynamoObjValue.BOOL);
