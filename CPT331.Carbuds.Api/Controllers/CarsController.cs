@@ -61,5 +61,26 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
-  }
+    [HttpGet("{Uuid}")]
+    public async Task<GetCarResponse> GetCar(string Uuid)
+    {
+        try
+        {
+            return new GetCarResponse()
+            {
+                Success = true,
+                car = await _carService.GetCar(Uuid)
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception encountered in GET to /api/cars/Uuid: {JsonConvert.SerializeObject(e)}");
+            return new GetCarResponse()
+            {
+                Success = false,
+                ErrorMessage = e.Message
+            };
+        }
+    }
+    }
 }

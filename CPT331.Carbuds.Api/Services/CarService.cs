@@ -13,6 +13,7 @@ namespace CPT331.Carbuds.Api.Services
   {
     Task<List<Car>> ListAllCars();
     Task<bool> AddUpdateCar(Car record);
+    Task<Car> GetCar(string Uuid);
   }
 
   public class CarService: ICarService
@@ -57,22 +58,40 @@ namespace CPT331.Carbuds.Api.Services
       return true;
     }
 
-    //QueryRequest query = new QueryRequest()
-    //{
-    //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
-    //  ReturnConsumedCapacity = "TOTAL",
-    //  KeyConditionExpression = "CustomerId = :v_CustomerId",
-    //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
-    //            {
-    //                {
-    //                    ":v_CustomerId",
-    //                    new AttributeValue
-    //                    {
-    //                        S = customerId
-    //                    }
-    //                }
-    //            }
-    //};
+    public async Task<Car> GetCar(string Uuid)
+    {
+        Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+        {
+        { "Uuid", new AttributeValue { S = Uuid } },
+        };
+        GetItemRequest itemReq = new GetItemRequest()
+        {
+            TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
+            Key = key
+        };
+        var dbResult = await _dynamoDb.GetItemAsync(itemReq);
+        var car = _utils.ToObjectFromDynamoResult<Car>(dbResult.Item);
 
-  }
+        return car;
+    }
+
+
+        //QueryRequest query = new QueryRequest()
+        //{
+        //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
+        //  ReturnConsumedCapacity = "TOTAL",
+        //  KeyConditionExpression = "CustomerId = :v_CustomerId",
+        //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+        //            {
+        //                {
+        //                    ":v_CustomerId",
+        //                    new AttributeValue
+        //                    {
+        //                        S = customerId
+        //                    }
+        //                }
+        //            }
+        //};
+
+    }
 }
