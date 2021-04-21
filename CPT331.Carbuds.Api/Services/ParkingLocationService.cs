@@ -50,16 +50,44 @@ namespace CPT331.Carbuds.Api.Services
 
         }
 
-        // method to add a parking location to database
+        // method to add or update a parking location to database
         public async Task<bool> AddUpdateParkingLocation(ParkingLocation record)
         {
-            var putReq = new PutItemRequest()
+            // store the uuid of the passed record
+            var parkingUuid = record.Uuid;
+            var parkingLocationExists = false;
+
+            // scan the parking locations table for locations and store in scanReq variable
+            ScanRequest scanReq = new ScanRequest()
             {
-                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
-                Item = _utils.ToDynamoAttributeValueDictionary<ParkingLocation>(record)
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocationsTable"),
             };
-            var response = await _dynamoDb.PutItemAsync(putReq);
-            return true;
+
+            // check if the parking location uuid already exists in database
+            var dbResult = await _dynamoDb.ScanAsync(scanReq);
+            foreach (var item in dbResult.Items)
+            {
+                if(_utils.ToObjectFromDynamoResult<ParkingLocation>(item).Uuid == parkingUuid)
+                {   // if yes update parkingLocationExists to true
+                    parkingLocationExists = true;
+                }
+            }
+
+            // add the parking location to the database if the location does not already exist
+            if (parkingLocationExists == false)
+            {
+                var putReq = new PutItemRequest()
+                {
+                    TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                    Item = _utils.ToDynamoAttributeValueDictionary<ParkingLocation>(record)
+                };
+                var response = await _dynamoDb.PutItemAsync(putReq);
+                return true;
+            }
+
+            return false;
         }
+
     }
 }
+
