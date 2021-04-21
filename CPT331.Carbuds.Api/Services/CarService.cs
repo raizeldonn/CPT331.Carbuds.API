@@ -13,6 +13,7 @@ namespace CPT331.Carbuds.Api.Services
   {
     Task<List<Car>> ListAllCars();
     Task<bool> AddUpdateCar(Car record);
+    Task<bool> DeleteCar(string carUuid);
   }
 
   public class CarService: ICarService
@@ -57,22 +58,19 @@ namespace CPT331.Carbuds.Api.Services
       return true;
     }
 
-    //QueryRequest query = new QueryRequest()
-    //{
-    //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
-    //  ReturnConsumedCapacity = "TOTAL",
-    //  KeyConditionExpression = "CustomerId = :v_CustomerId",
-    //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
-    //            {
-    //                {
-    //                    ":v_CustomerId",
-    //                    new AttributeValue
-    //                    {
-    //                        S = customerId
-    //                    }
-    //                }
-    //            }
-    //};
+    public async Task<bool> DeleteCar(string carUuid)
+    {
+      var delReq = new DeleteItemRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
+        Key = new Dictionary<string, AttributeValue>() {
+            { "Uuid", new AttributeValue { S = carUuid } },
+        }
+      };
+
+      var response = await _dynamoDb.DeleteItemAsync(delReq);
+      return true;
+    }
 
   }
 }

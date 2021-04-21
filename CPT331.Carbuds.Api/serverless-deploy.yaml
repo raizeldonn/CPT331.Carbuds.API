@@ -154,6 +154,25 @@ Resources:
         WriteCapacityUnits: 2
       TableName: carbuds-parkingLocations
 
+  CarParkingAllocationsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: CarUuid
+          AttributeType: S
+        - AttributeName: LocationUuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: CarUuid
+          KeyType: HASH
+        - AttributeName: LocationUuid
+          KeyType: RANGE
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-carParkingAllocations
+
 Outputs:
   ApiURL:
     Description: raw API endpoint URL for this environment

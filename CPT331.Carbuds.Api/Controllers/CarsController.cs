@@ -62,5 +62,26 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
+
+    [HttpDelete]
+    public async Task<DeleteCarResponse> DeleteCar(DeleteCarRequest request)
+    {
+      try
+      {
+        return new DeleteCarResponse()
+        {
+          Success = await _carService.DeleteCar(request.carUuid)
+        };
+      }
+      catch(Exception e)
+      {
+        return new DeleteCarResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
+
   }
 }
