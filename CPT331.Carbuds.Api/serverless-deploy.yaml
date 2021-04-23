@@ -168,6 +168,18 @@ Resources:
           KeyType: HASH
         - AttributeName: LocationUuid
           KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: LocationIndex
+          KeySchema:
+          - AttributeName: LocationUuid
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2

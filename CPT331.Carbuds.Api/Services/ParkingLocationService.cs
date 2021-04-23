@@ -11,9 +11,9 @@ namespace CPT331.Carbuds.Api.Services
 {
   public interface IParkingLocationService
   {
-    // get a list of parking locations from database
     Task<List<ParkingLocation>> ListAllParkingLocations();
-    // add parking location in database
+    Task<List<ParkingAllocation>> ListAllParkingAllocations();
+    Task<List<ParkingLocation>> ListAvailableParkingLocations();
     Task<bool> AddUpdateParkingLocation(ParkingLocation record);
     Task<bool> DeleteParkingLocation(string parkingLocationUuid);
   }
@@ -51,7 +51,30 @@ namespace CPT331.Carbuds.Api.Services
 
     }
 
-    // method to add a parking location to database
+    public async Task<List<ParkingAllocation>> ListAllParkingAllocations()
+    {
+      var allocationList = new List<ParkingAllocation>();
+      ScanRequest scanReq = new ScanRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:CarParkingAllocations")
+      };
+      var dbResult = await _dynamoDb.ScanAsync(scanReq);
+
+      foreach(var item in dbResult.Items)
+      {
+        allocationList.Add(_utils.ToObjectFromDynamoResult<ParkingAllocation>(item));
+      }
+      return allocationList;
+    }
+
+    public async Task<List<ParkingLocation>> ListAvailableParkingLocations()
+    {
+      var allParkingLocations = await ListAllParkingLocations();
+      var allAllocations = await ListAllParkingAllocations();
+
+      return allParkingLocations.Except(allParkingLocations.Join(allAllocations, p => p.Uuid, a => a.LocationUuid, (p, a) => p)).ToList();     
+    }
+    
     public async Task<bool> AddUpdateParkingLocation(ParkingLocation record)
     {
       var putReq = new PutItemRequest()

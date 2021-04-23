@@ -63,6 +63,28 @@ namespace CPT331.Carbuds.Api.Controllers
       }
     }
 
+    [HttpGet("list/available")]
+    public async Task<GetAvailableParkingLocationsResponse> ListAvailableParkingLocations()
+    {
+      try
+      {
+        return new GetAvailableParkingLocationsResponse()
+        {
+          Success = true,
+          ParkingLocations = await _parkingLocationService.ListAvailableParkingLocations()
+        };
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine($"Exception encountered in GET to /api/parkingLocations/list/available: {JsonConvert.SerializeObject(e)}");
+        return new GetAvailableParkingLocationsResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
+
     [HttpDelete]
     public async Task<DeleteParkingLocationResponse> DeleteParkingLocation(DeleteParkingLocationRequest request)
     {
