@@ -9,95 +9,109 @@ using Microsoft.Extensions.Configuration;
 
 namespace CPT331.Carbuds.Api.Services
 {
-  public interface IParkingLocationService
-  {
-    Task<List<ParkingLocation>> ListAllParkingLocations();
-    Task<List<ParkingAllocation>> ListAllParkingAllocations();
-    Task<List<ParkingLocation>> ListAvailableParkingLocations();
-    Task<bool> AddUpdateParkingLocation(ParkingLocation record);
-    Task<bool> DeleteParkingLocation(string parkingLocationUuid);
-  }
-
-  public class ParkingLocationService : IParkingLocationService
-  {
-    private IAmazonDynamoDB _dynamoDb;
-    private IConfiguration _config;
-    private IUtilityService _utils;
-
-    // constructor
-    public ParkingLocationService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils)
+    public interface IParkingLocationService
     {
-      _dynamoDb = dynamoDb;
-      _config = config;
-      _utils = utils;
+        Task<List<ParkingLocation>> ListAllParkingLocations();
+        Task<ParkingLocation> GetParkingLocation(string parkingLocationId);
+        Task<List<ParkingLocation>> ListAvailableParkingLocations();
+        Task<bool> AddUpdateParkingLocation(ParkingLocation record);
+        Task<bool> DeleteParkingLocation(string parkingLocationUuid);
     }
 
-    // method to retrieve a list of parking locations from database
-    public async Task<List<ParkingLocation>> ListAllParkingLocations()
+    public class ParkingLocationService : IParkingLocationService
     {
-      var parkingLocationList = new List<ParkingLocation>();
-      ScanRequest scanReq = new ScanRequest()
-      {
-        TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations")
-      };
+        private IAmazonDynamoDB _dynamoDb;
+        private IConfiguration _config;
+        private IUtilityService _utils;
+        private IParkingAllocationService _plService;
 
-      var dbResult = await _dynamoDb.ScanAsync(scanReq);
-      foreach (var item in dbResult.Items)
-      {
-        parkingLocationList.Add(_utils.ToObjectFromDynamoResult<ParkingLocation>(item));
-      }
+        // constructor
+        public ParkingLocationService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils, IParkingAllocationService plService)
+        {
+            _dynamoDb = dynamoDb;
+            _config = config;
+            _utils = utils;
+            _plService = plService;
+        }
 
-      return parkingLocationList;
+        // method to retrieve a list of parking locations from database
+        public async Task<List<ParkingLocation>> ListAllParkingLocations()
+        {
+            var parkingLocationList = new List<ParkingLocation>();
+            ScanRequest scanReq = new ScanRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations")
+            };
 
-    }
+            var dbResult = await _dynamoDb.ScanAsync(scanReq);
+            foreach (var item in dbResult.Items)
+            {
+                parkingLocationList.Add(_utils.ToObjectFromDynamoResult<ParkingLocation>(item));
+            }
 
-    public async Task<List<ParkingAllocation>> ListAllParkingAllocations()
-    {
-      var allocationList = new List<ParkingAllocation>();
-      ScanRequest scanReq = new ScanRequest()
-      {
-        TableName = _config.GetValue<string>("DynamoDb:Tablenames:CarParkingAllocations")
-      };
-      var dbResult = await _dynamoDb.ScanAsync(scanReq);
+            return parkingLocationList;
+        }
 
-      foreach(var item in dbResult.Items)
-      {
-        allocationList.Add(_utils.ToObjectFromDynamoResult<ParkingAllocation>(item));
-      }
-      return allocationList;
-    }
+        public async Task<ParkingLocation> GetParkingLocation(string parkingLocationId)
+        {
+            QueryRequest query = new QueryRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                ReturnConsumedCapacity = "TOTAL",
+                KeyConditionExpression = "#Uuid = :v_Uuid",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+                {
+                    {
+                        ":v_Uuid",
+                        new AttributeValue
+                        {
+                            S = parkingLocationId
+                        }
+                    }
+                },
+                ExpressionAttributeNames = new Dictionary<string, string>()
+                {
+                  {
+                    "#Uuid" , "Uuid"
+                  }
+                }
+            };
 
-    public async Task<List<ParkingLocation>> ListAvailableParkingLocations()
-    {
-      var allParkingLocations = await ListAllParkingLocations();
-      var allAllocations = await ListAllParkingAllocations();
+            var queryResult = await _dynamoDb.QueryAsync(query);
+            return queryResult.Items.Any() ? _utils.ToObjectFromDynamoResult<ParkingLocation>(queryResult.Items.First()) : null;
+        }
 
-      return allParkingLocations.Except(allParkingLocations.Join(allAllocations, p => p.Uuid, a => a.LocationUuid, (p, a) => p)).ToList();     
-    }
-    
-    public async Task<bool> AddUpdateParkingLocation(ParkingLocation record)
-    {
-      var putReq = new PutItemRequest()
-      {
-        TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
-        Item = _utils.ToDynamoAttributeValueDictionary<ParkingLocation>(record)
-      };
-      var response = await _dynamoDb.PutItemAsync(putReq);
-      return true;
-    }
+        public async Task<List<ParkingLocation>> ListAvailableParkingLocations()
+        {
+            var allParkingLocations = await ListAllParkingLocations();
+            var allAllocations = await _plService.ListAllParkingAllocations();
 
-    public async Task<bool> DeleteParkingLocation(string parkingLocationUuid)
-    {
-      var delReq = new DeleteItemRequest()
-      {
-        TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
-        Key = new Dictionary<string, AttributeValue>() {
+            return allParkingLocations.Except(allParkingLocations.Join(allAllocations, p => p.Uuid, a => a.LocationUuid, (p, a) => p)).ToList();
+        }
+
+        public async Task<bool> AddUpdateParkingLocation(ParkingLocation record)
+        {
+            var putReq = new PutItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                Item = _utils.ToDynamoAttributeValueDictionary<ParkingLocation>(record)
+            };
+            var response = await _dynamoDb.PutItemAsync(putReq);
+            return true;
+        }
+
+        public async Task<bool> DeleteParkingLocation(string parkingLocationUuid)
+        {
+            var delReq = new DeleteItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                Key = new Dictionary<string, AttributeValue>() {
             { "Uuid", new AttributeValue { S = parkingLocationUuid } },
         }
-      };
+            };
 
-      var response = await _dynamoDb.DeleteItemAsync(delReq);
-      return true;
+            var response = await _dynamoDb.DeleteItemAsync(delReq);
+            return true;
+        }
     }
-  }
 }

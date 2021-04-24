@@ -41,6 +41,27 @@ namespace CPT331.Carbuds.Api.Controllers
       }
     }
 
+    [HttpGet()]
+    public async Task<GetParkingLocationResponse> GetParkingLocation(string locationUuid)
+    {
+      try
+      {
+        return new GetParkingLocationResponse()
+        {
+          Success = true,
+          Location = await _parkingLocationService.GetParkingLocation(locationUuid)
+        };
+      }
+      catch(Exception e)
+      {
+        return new GetParkingLocationResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
+
     [HttpGet("list")]
     public async Task<GetListParkingLocationsResponse> ListAllParkingLocations()
     {
@@ -95,7 +116,7 @@ namespace CPT331.Carbuds.Api.Controllers
           Success = await _parkingLocationService.DeleteParkingLocation(request.LocationUuid)
         };
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         return new DeleteParkingLocationResponse()
         {
