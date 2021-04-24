@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CPT331.Carbuds.Api.Models.Car;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Configuration;
+using CPT331.Carbuds.Api.Models.ParkingLocation;
 
 namespace CPT331.Carbuds.Api.Services
 {
@@ -21,12 +22,14 @@ namespace CPT331.Carbuds.Api.Services
     private IAmazonDynamoDB _dynamoDb;
     private IConfiguration _config;
     private IUtilityService _utils;
+    private IParkingAllocationService _plService;
 
-    public CarService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils)
+    public CarService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils, IParkingAllocationService plService)
     {
       _dynamoDb = dynamoDb;
       _config = config;
       _utils = utils;
+      _plService = plService;
     }
 
     public async Task<List<Car>> ListAllCars()
@@ -55,6 +58,23 @@ namespace CPT331.Carbuds.Api.Services
         Item = _utils.ToDynamoAttributeValueDictionary<Car>(record)
       };
       var response = await _dynamoDb.PutItemAsync(putReq);
+
+      
+      //todo - wrap this in a check to see if the record has changed before doing the allocation update process.
+      var existingParkingAllocation = await _plService.GetParkingAllocationByCar(record.Uuid);
+      if(existingParkingAllocation != null)
+      {
+        var existingAllocationDeleted = await _plService.DeleteParkingAllocation(existingParkingAllocation);
+      }
+
+      ParkingAllocation newAlloc = new ParkingAllocation()
+      {
+        CarUuid = record.Uuid,
+        LocationUuid = record.Location
+      };
+
+      var newParkingLocation = await _plService.AddEditParkingAllocation(newAlloc);
+
       return true;
     }
 
