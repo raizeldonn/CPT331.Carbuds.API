@@ -41,7 +41,7 @@ namespace CPT331.Carbuds.Api.Controllers
       }
     }
 
-    [HttpGet()]
+    [HttpGet]
     public async Task<GetParkingLocationResponse> GetParkingLocation(string locationUuid)
     {
       try
