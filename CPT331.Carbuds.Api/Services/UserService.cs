@@ -15,7 +15,8 @@ namespace CPT331.Carbuds.Api.Services
   public interface IUserService
   {
     Task<bool> CreateCognitoUser(PostCreateCognitoUserRequest request);
-  }
+    Task<UserProfile> GetUserInfo(string userId);
+    }
 
   public class UserService: IUserService
   {
@@ -34,7 +35,6 @@ namespace CPT331.Carbuds.Api.Services
 
     public async Task<bool> CreateCognitoUser(PostCreateCognitoUserRequest request)
     {
-
       AdminCreateUserRequest createUserReq = new AdminCreateUserRequest()
       {
         UserPoolId = _config.GetValue<string>("Cognito:UserPoolId"),
@@ -55,9 +55,7 @@ namespace CPT331.Carbuds.Api.Services
         DesiredDeliveryMediums = new List<string>() { "EMAIL" },
         MessageAction = "SUPPRESS"
       };
-
       var userCreated = await _cognito.AdminCreateUserAsync(createUserReq);
-
       AdminAddUserToGroupRequest addToGroupReq = new AdminAddUserToGroupRequest()
       {
         GroupName = "carbuds-users",
@@ -65,9 +63,7 @@ namespace CPT331.Carbuds.Api.Services
         UserPoolId = _config.GetValue<string>("Cognito:UserPoolId")
       };
       var addComplete = await _cognito.AdminAddUserToGroupAsync(addToGroupReq);
-
       var pwSet = await SetCognitoUserPassword(request.Email, request.Password);
-
       UserProfile newUserProfile = new UserProfile()
       {
         Email = request.Email,
@@ -76,7 +72,6 @@ namespace CPT331.Carbuds.Api.Services
         PaymentCardCvv = request.CardCvv,
         PaymentCardExpiry = request.CardExpiry
       };
-
       var profileCreated = await AddUpdateUserProfile(newUserProfile);
 
       return true;
@@ -91,7 +86,6 @@ namespace CPT331.Carbuds.Api.Services
         Password = newPassword,
         Permanent = true
       };
-
       var setPw = await _cognito.AdminSetUserPasswordAsync(confirmPw);
       return true;
     }
@@ -106,5 +100,21 @@ namespace CPT331.Carbuds.Api.Services
       var response = await _dynamoDb.PutItemAsync(putReq);
       return true;
     }
-  }
+        public async Task<UserProfile> GetUserInfo(string userEmail)
+        {
+            Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+            {
+            { "Email", new AttributeValue { S = userEmail } },
+            };
+            GetItemRequest itemReq = new GetItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:UserProfiles"),
+                Key = key
+            };
+            var dbResult = await _dynamoDb.GetItemAsync(itemReq);
+            var user = _utils.ToObjectFromDynamoResult<UserProfile>(dbResult.Item);
+
+            return user;
+        }
+    }
 }
