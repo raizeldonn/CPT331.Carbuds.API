@@ -62,7 +62,7 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
-    [HttpGet("{Uuid}")]
+    [HttpGet("getByCarId{Uuid}")]
     public async Task<GetCarResponse> GetCar(string Uuid)
     {
         try
@@ -83,5 +83,26 @@ namespace CPT331.Carbuds.Api.Controllers
             };
         }
     }
+        [HttpGet("getByParkingId{Uuid}")]
+        public async Task<GetCarResponse> GetCarByParkingId(string Uuid)
+        {
+            try
+            {
+                return new GetCarResponse()
+                {
+                    Success = true,
+                    car = await _carService.GetCarByParkingId(Uuid)
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception encountered in GET to /api/cars/Uuid: {JsonConvert.SerializeObject(e)}");
+                return new GetCarResponse()
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
     }
 }

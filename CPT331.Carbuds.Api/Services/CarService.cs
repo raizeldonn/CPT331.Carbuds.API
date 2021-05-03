@@ -14,7 +14,8 @@ namespace CPT331.Carbuds.Api.Services
     Task<List<Car>> ListAllCars();
     Task<bool> AddUpdateCar(Car record);
     Task<Car> GetCar(string Uuid);
-  }
+    Task<Car> GetCarByParkingId(string Uuid);
+    }
 
   public class CarService: ICarService
   {
@@ -74,6 +75,23 @@ namespace CPT331.Carbuds.Api.Services
 
         return car;
     }
+
+        public async Task<Car> GetCarByParkingId(string Uuid)
+        {
+            Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+        {
+        { "location", new AttributeValue { S = Uuid } },
+        };
+            GetItemRequest itemReq = new GetItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
+                Key = key
+            };
+            var dbResult = await _dynamoDb.GetItemAsync(itemReq);
+            var car = _utils.ToObjectFromDynamoResult<Car>(dbResult.Item);
+
+            return car;
+        }
 
 
         //QueryRequest query = new QueryRequest()
