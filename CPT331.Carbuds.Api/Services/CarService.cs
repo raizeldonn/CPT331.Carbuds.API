@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CPT331.Carbuds.Api.Models.Car;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Configuration;
+using CPT331.Carbuds.Api.Models.ParkingLocation;
 
 namespace CPT331.Carbuds.Api.Services
 {
@@ -13,6 +14,8 @@ namespace CPT331.Carbuds.Api.Services
   {
     Task<List<Car>> ListAllCars();
     Task<bool> AddUpdateCar(Car record);
+    Task<Car> GetCar(string Uuid);
+    Task<bool> DeleteCar(string carUuid);
   }
 
   public class CarService: ICarService
@@ -20,12 +23,14 @@ namespace CPT331.Carbuds.Api.Services
     private IAmazonDynamoDB _dynamoDb;
     private IConfiguration _config;
     private IUtilityService _utils;
+    private IParkingAllocationService _plService;
 
-    public CarService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils)
+    public CarService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils, IParkingAllocationService plService)
     {
       _dynamoDb = dynamoDb;
       _config = config;
       _utils = utils;
+      _plService = plService;
     }
 
     public async Task<List<Car>> ListAllCars()
@@ -43,7 +48,6 @@ namespace CPT331.Carbuds.Api.Services
       }
 
       return carList;
-      
     }
 
     public async Task<bool> AddUpdateCar(Car record)
@@ -54,25 +58,71 @@ namespace CPT331.Carbuds.Api.Services
         Item = _utils.ToDynamoAttributeValueDictionary<Car>(record)
       };
       var response = await _dynamoDb.PutItemAsync(putReq);
+
+      //todo - wrap this in a check to see if the record has changed before doing the allocation update process.
+      var existingParkingAllocation = await _plService.GetParkingAllocationByCar(record.Uuid);
+      if(existingParkingAllocation != null)
+      {
+        var existingAllocationDeleted = await _plService.DeleteParkingAllocation(existingParkingAllocation);
+      }
+
+      ParkingAllocation newAlloc = new ParkingAllocation()
+      {
+        CarUuid = record.Uuid,
+        LocationUuid = record.Location
+      };
+      var newParkingLocation = await _plService.AddEditParkingAllocation(newAlloc);
+
       return true;
     }
 
-    //QueryRequest query = new QueryRequest()
-    //{
-    //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
-    //  ReturnConsumedCapacity = "TOTAL",
-    //  KeyConditionExpression = "CustomerId = :v_CustomerId",
-    //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
-    //            {
-    //                {
-    //                    ":v_CustomerId",
-    //                    new AttributeValue
-    //                    {
-    //                        S = customerId
-    //                    }
-    //                }
-    //            }
-    //};
+    public async Task<Car> GetCar(string Uuid)
+    {
+        Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
+        {
+        { "Uuid", new AttributeValue { S = Uuid } },
+        };
+        GetItemRequest itemReq = new GetItemRequest()
+        {
+            TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
+            Key = key
+        };
+        var dbResult = await _dynamoDb.GetItemAsync(itemReq);
+        var car = _utils.ToObjectFromDynamoResult<Car>(dbResult.Item);
+        return car;
+    }
 
-  }
+    public async Task<bool> DeleteCar(string carUuid)
+    {
+      var delReq = new DeleteItemRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
+        Key = new Dictionary<string, AttributeValue>() {
+            { "Uuid", new AttributeValue { S = carUuid } },
+        }
+      };
+      var response = await _dynamoDb.DeleteItemAsync(delReq);
+      return true;
+    }
+
+
+
+        //QueryRequest query = new QueryRequest()
+        //{
+        //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
+        //  ReturnConsumedCapacity = "TOTAL",
+        //  KeyConditionExpression = "CustomerId = :v_CustomerId",
+        //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+        //            {
+        //                {
+        //                    ":v_CustomerId",
+        //                    new AttributeValue
+        //                    {
+        //                        S = customerId
+        //                    }
+        //                }
+        //            }
+        //};
+
+    }
 }

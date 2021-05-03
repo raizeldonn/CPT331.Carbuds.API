@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CPT331.Carbuds.Api.Models.Car;
 
 namespace CPT331.Carbuds.Api.Contracts.Car
 {
-  public class GetListCarsResponse: BaseResponse
+  public class GetCarResponse: BaseResponse
   {
-    public List<CPT331.Carbuds.Api.Models.Car.Car> Cars { get; set; }
+    public CPT331.Carbuds.Api.Models.Car.Car car { get; set; }
   }
-} 
+}
