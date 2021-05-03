@@ -15,7 +15,6 @@ namespace CPT331.Carbuds.Api.Services
     Task<List<Car>> ListAllCars();
     Task<bool> AddUpdateCar(Car record);
     Task<Car> GetCar(string Uuid);
-    Task<Car> GetCarByParkingId(string Uuid);
     Task<bool> DeleteCar(string carUuid);
   }
 
@@ -49,7 +48,6 @@ namespace CPT331.Carbuds.Api.Services
       }
 
       return carList;
-      
     }
 
     public async Task<bool> AddUpdateCar(Car record)
@@ -61,7 +59,6 @@ namespace CPT331.Carbuds.Api.Services
       };
       var response = await _dynamoDb.PutItemAsync(putReq);
 
-      
       //todo - wrap this in a check to see if the record has changed before doing the allocation update process.
       var existingParkingAllocation = await _plService.GetParkingAllocationByCar(record.Uuid);
       if(existingParkingAllocation != null)
@@ -74,7 +71,6 @@ namespace CPT331.Carbuds.Api.Services
         CarUuid = record.Uuid,
         LocationUuid = record.Location
       };
-
       var newParkingLocation = await _plService.AddEditParkingAllocation(newAlloc);
 
       return true;
@@ -86,22 +82,6 @@ namespace CPT331.Carbuds.Api.Services
         {
         { "Uuid", new AttributeValue { S = Uuid } },
         };
-        GetItemRequest itemReq = new GetItemRequest()
-        {
-            TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
-            Key = key
-        };
-        var dbResult = await _dynamoDb.GetItemAsync(itemReq);
-        var car = _utils.ToObjectFromDynamoResult<Car>(dbResult.Item);
-        return car;
-    }
-
-    public async Task<Car> GetCarByParkingId(string Uuid)
-    {
-        Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
-    {
-    { "location", new AttributeValue { S = Uuid } },
-    };
         GetItemRequest itemReq = new GetItemRequest()
         {
             TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
