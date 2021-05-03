@@ -23,11 +23,19 @@ namespace CPT331.Carbuds.Api
     }
 
     public static IConfiguration Configuration { get; private set; }
+    public const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddControllers();
+
+      services.AddCors(options =>
+      {
+        options.AddPolicy(MyAllowSpecificOrigins,
+        builder => builder.WithOrigins("*"));
+      });
+
 
       services.AddAWSService<Amazon.DynamoDBv2.IAmazonDynamoDB>();
       services.AddAWSService<Amazon.CognitoIdentityProvider.IAmazonCognitoIdentityProvider>();
@@ -35,6 +43,7 @@ namespace CPT331.Carbuds.Api
       services.AddSingleton<IUtilityService, UtilityService>();
       services.AddSingleton<IAuthService, AuthService>();
       services.AddSingleton<IUserService, UserService>();
+      services.AddSingleton<IParkingAllocationService, ParkingAllocationService>();
       services.AddSingleton<ICarService, CarService>();
       services.AddSingleton<IParkingLocationService, ParkingLocationService>();
 
@@ -49,6 +58,7 @@ namespace CPT331.Carbuds.Api
       }
 
       app.UseHttpsRedirection();
+      app.UseCors(MyAllowSpecificOrigins);
 
       app.UseRouting();
 
@@ -59,8 +69,8 @@ namespace CPT331.Carbuds.Api
         endpoints.MapControllers();
         endpoints.MapGet("/", async context =>
               {
-                await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
-              });
+            await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+          });
       });
     }
   }

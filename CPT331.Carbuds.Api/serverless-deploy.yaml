@@ -44,6 +44,7 @@ Resources:
         - AWSLambda_FullAccess
         - AWSLambdaDynamoDBExecutionRole
         - AmazonDynamoDBFullAccess
+        - AmazonCognitoPowerUser
         - Statement:
           - Sid: SSMParametersPolicy
             Effect: Allow
@@ -64,6 +65,9 @@ Resources:
             Path: '/api/auth/login'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
+            Auth:
+              Authorizer: 'NONE'
+
 
         #------------- Cars -------------
         CarsAddUpdateCar:
@@ -78,7 +82,60 @@ Resources:
           Properties:
             Path: '/api/cars/list'
             Method: Get
+            RestApiId: !Ref "CarbudsApi"
+
+        CarsDeleteCar:
+          Type: Api
+          Properties:
+            Path: '/api/cars'
+            Method: Delete
             RestApiId: !Ref "CarbudsApi" 
+
+        #------------- Parking Location -------------
+        ParkingLocationAddUpdateParkingLocation:
+          Type: Api
+          Properties:
+            Path: '/api/parkingLocation'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+
+        ParkingLocationGetParkingLocation:
+          Type: Api
+          Properties:
+            Path: '/api/parkingLocation'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi"
+
+        ParkingLocationListAllParkingLocations:
+          Type: Api
+          Properties:
+            Path: '/api/parkingLocation/list'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi"
+
+        ParkingLocationListAvailableParkingLocations:
+          Type: Api
+          Properties:
+            Path: '/api/parkingLocation/list/available'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi"
+
+        ParkingLocationDeleteParkingLocation:
+          Type: Api
+          Properties:
+            Path: '/api/parkingLocation'
+            Method: Delete
+            RestApiId: !Ref "CarbudsApi"
+
+        #------------- User -------------
+        UserSignup:
+          Type: Api
+          Properties:
+            Path: '/api/user/signup'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+            Auth:
+              Authorizer: 'NONE'
 
   # ---------------- DYNAMO TABLE DEFINITIONS ----------------
   
@@ -153,6 +210,37 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
       TableName: carbuds-parkingLocations
+
+  CarParkingAllocationsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: CarUuid
+          AttributeType: S
+        - AttributeName: LocationUuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: CarUuid
+          KeyType: HASH
+        - AttributeName: LocationUuid
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: LocationIndex
+          KeySchema:
+          - AttributeName: LocationUuid
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-carParkingAllocations
 
 Outputs:
   ApiURL:

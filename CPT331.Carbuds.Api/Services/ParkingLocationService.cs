@@ -11,24 +11,27 @@ namespace CPT331.Carbuds.Api.Services
 {
     public interface IParkingLocationService
     {
-        // get a list of parking locations from database
         Task<List<ParkingLocation>> ListAllParkingLocations();
-        // add parking location in database
+        Task<ParkingLocation> GetParkingLocation(string parkingLocationId);
+        Task<List<ParkingLocation>> ListAvailableParkingLocations();
         Task<bool> AddUpdateParkingLocation(ParkingLocation record);
+        Task<bool> DeleteParkingLocation(string parkingLocationUuid);
     }
 
-    public class ParkingLocationService: IParkingLocationService
+    public class ParkingLocationService : IParkingLocationService
     {
         private IAmazonDynamoDB _dynamoDb;
         private IConfiguration _config;
         private IUtilityService _utils;
+        private IParkingAllocationService _plService;
 
         // constructor
-        public ParkingLocationService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils)
+        public ParkingLocationService(IAmazonDynamoDB dynamoDb, IConfiguration config, IUtilityService utils, IParkingAllocationService plService)
         {
             _dynamoDb = dynamoDb;
             _config = config;
             _utils = utils;
+            _plService = plService;
         }
 
         // method to retrieve a list of parking locations from database
@@ -47,10 +50,45 @@ namespace CPT331.Carbuds.Api.Services
             }
 
             return parkingLocationList;
-
         }
 
-        // method to add a parking location to database
+        public async Task<ParkingLocation> GetParkingLocation(string parkingLocationId)
+        {
+            QueryRequest query = new QueryRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                ReturnConsumedCapacity = "TOTAL",
+                KeyConditionExpression = "#Uuid = :v_Uuid",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+                {
+                    {
+                        ":v_Uuid",
+                        new AttributeValue
+                        {
+                            S = parkingLocationId
+                        }
+                    }
+                },
+                ExpressionAttributeNames = new Dictionary<string, string>()
+                {
+                  {
+                    "#Uuid" , "Uuid"
+                  }
+                }
+            };
+
+            var queryResult = await _dynamoDb.QueryAsync(query);
+            return queryResult.Items.Any() ? _utils.ToObjectFromDynamoResult<ParkingLocation>(queryResult.Items.First()) : null;
+        }
+
+        public async Task<List<ParkingLocation>> ListAvailableParkingLocations()
+        {
+            var allParkingLocations = await ListAllParkingLocations();
+            var allAllocations = await _plService.ListAllParkingAllocations();
+
+            return allParkingLocations.Except(allParkingLocations.Join(allAllocations, p => p.Uuid, a => a.LocationUuid, (p, a) => p)).ToList();
+        }
+
         public async Task<bool> AddUpdateParkingLocation(ParkingLocation record)
         {
             var putReq = new PutItemRequest()
@@ -59,6 +97,20 @@ namespace CPT331.Carbuds.Api.Services
                 Item = _utils.ToDynamoAttributeValueDictionary<ParkingLocation>(record)
             };
             var response = await _dynamoDb.PutItemAsync(putReq);
+            return true;
+        }
+
+        public async Task<bool> DeleteParkingLocation(string parkingLocationUuid)
+        {
+            var delReq = new DeleteItemRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:ParkingLocations"),
+                Key = new Dictionary<string, AttributeValue>() {
+            { "Uuid", new AttributeValue { S = parkingLocationUuid } },
+        }
+            };
+
+            var response = await _dynamoDb.DeleteItemAsync(delReq);
             return true;
         }
     }
