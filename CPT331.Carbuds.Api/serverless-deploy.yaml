@@ -211,6 +211,21 @@ Resources:
         WriteCapacityUnits: 2
       TableName: carbuds-parkingLocations
 
+  BookingsTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: Uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Uuid
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      TableName: carbuds-booking
+
   CarParkingAllocationsTable:
     Type: 'AWS::DynamoDB::Table'
     DeletionPolicy: Delete
