@@ -64,7 +64,7 @@ namespace CPT331.Carbuds.Api.Controllers
         }
 
         [HttpGet("{Uuid}")]
-        public async Task<GetBookingResponse> GetCar(string Uuid)
+        public async Task<GetBookingResponse> GetBooking(string Uuid)
         {
             try
             {
@@ -76,8 +76,29 @@ namespace CPT331.Carbuds.Api.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception encountered in GET to /api/cars/Uuid: {JsonConvert.SerializeObject(e)}");
+                Console.WriteLine($"Exception encountered in GET to /api/booking/Uuid: {JsonConvert.SerializeObject(e)}");
                 return new GetBookingResponse()
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+        [HttpGet("clientbookings{ClientEmail}")]
+        public async Task<GetListBookingsResponse> GetClientBookings(string ClientEmail)
+        {
+            try
+            {
+                return new GetListBookingsResponse()
+                {
+                    Success = true,
+                    Bookings = await _bookingService.ListClientsBookings(ClientEmail)
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception encountered in GET to /api/clientbookings: {JsonConvert.SerializeObject(e)}");
+                return new GetListBookingsResponse()
                 {
                     Success = false,
                     ErrorMessage = e.Message

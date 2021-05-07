@@ -14,6 +14,7 @@ namespace CPT331.Carbuds.Api.Services
     Task<List<Booking>> ListAllBookings();
     Task<bool> AddUpdateBooking(Booking record);
     Task<Booking> GetBooking(string Uuid);
+    Task<List<Booking>> ListClientsBookings(string userEmail);
   }
 
     public class BookingService : IBookingService
@@ -38,6 +39,36 @@ namespace CPT331.Carbuds.Api.Services
             };
 
             var dbResult = await _dynamoDb.ScanAsync(scanReq);
+            foreach (var item in dbResult.Items)
+            {
+                bookingList.Add(_utils.ToObjectFromDynamoResult<Booking>(item));
+            }
+
+            return bookingList;
+        }
+
+        public async Task<List<Booking>> ListClientsBookings(string userEmail)
+        {
+            var bookingList = new List<Booking>();
+
+            ScanRequest query = new ScanRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:Bookings"),
+                ReturnConsumedCapacity = "TOTAL",
+                FilterExpression = "ClientEmail = :v_ClientEmail",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
+                {
+                  {
+                      ":v_ClientEmail",
+                      new AttributeValue
+                      {
+                          S = userEmail
+                      }
+                  }
+                }
+            };
+
+            var dbResult = await _dynamoDb.ScanAsync(query);
             foreach (var item in dbResult.Items)
             {
                 bookingList.Add(_utils.ToObjectFromDynamoResult<Booking>(item));

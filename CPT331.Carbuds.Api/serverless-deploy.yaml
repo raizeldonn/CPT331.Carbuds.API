@@ -218,9 +218,25 @@ Resources:
       AttributeDefinitions:
         - AttributeName: Uuid
           AttributeType: S
+        - AttributeName: ClientEmail
+          AttributeType: S
       KeySchema:
         - AttributeName: Uuid
           KeyType: HASH
+        - AttributeName: ClientEmail
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: ClientEmailIndex
+          KeySchema:
+          - AttributeName: ClientEmail
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
