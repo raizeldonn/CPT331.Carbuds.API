@@ -12,5 +12,7 @@ namespace CPT331.Carbuds.Api.Models.User
     public string PaymentCardNumber { get; set; }
     public string PaymentCardExpiry { get; set; }
     public string PaymentCardCvv { get; set; }
-  }
+    public string LicenseCountry { get; set; }
+    public string LicenseNumber { get; set; }
+    }
 }
