@@ -63,9 +63,10 @@ namespace CPT331.Carbuds.Api.Controllers
             }
         }
 
-        [HttpGet("{Uuid}")]
+        [HttpGet("getbyId{Uuid}")]
         public async Task<GetBookingResponse> GetBooking(string Uuid)
         {
+
             try
             {
                 return new GetBookingResponse()
@@ -84,15 +85,15 @@ namespace CPT331.Carbuds.Api.Controllers
                 };
             }
         }
-        [HttpGet("clientbookings{ClientEmail}")]
-        public async Task<GetListBookingsResponse> GetClientBookings(string ClientEmail)
+        [HttpGet("clientbookings{UserEmail}")]
+        public async Task<GetListBookingsResponse> GetClientBookings(string UserEmail)
         {
             try
             {
                 return new GetListBookingsResponse()
                 {
                     Success = true,
-                    Bookings = await _bookingService.ListClientsBookings(ClientEmail)
+                    Bookings = await _bookingService.ListClientsBookings(UserEmail)
                 };
             }
             catch (Exception e)

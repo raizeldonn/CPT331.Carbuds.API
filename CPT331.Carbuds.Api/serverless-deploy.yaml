@@ -218,17 +218,17 @@ Resources:
       AttributeDefinitions:
         - AttributeName: Uuid
           AttributeType: S
-        - AttributeName: ClientEmail
+        - AttributeName: UserEmail
           AttributeType: S
       KeySchema:
         - AttributeName: Uuid
           KeyType: HASH
-        - AttributeName: ClientEmail
+        - AttributeName: UserEmail
           KeyType: RANGE
       GlobalSecondaryIndexes:
-        - IndexName: ClientEmailIndex
+        - IndexName: UserEmailIndex
           KeySchema:
-          - AttributeName: ClientEmail
+          - AttributeName: UserEmail
             KeyType: HASH
           Projection:
             NonKeyAttributes:
@@ -240,7 +240,7 @@ Resources:
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
-      TableName: carbuds-booking
+      TableName: carbuds-bookings
 
   CarParkingAllocationsTable:
     Type: 'AWS::DynamoDB::Table'

@@ -55,11 +55,11 @@ namespace CPT331.Carbuds.Api.Services
             {
                 TableName = _config.GetValue<string>("DynamoDb:Tablenames:Bookings"),
                 ReturnConsumedCapacity = "TOTAL",
-                FilterExpression = "ClientEmail = :v_ClientEmail",
+                FilterExpression = "UserEmail = :v_UserEmail",
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
                 {
                   {
-                      ":v_ClientEmail",
+                      ":v_UserEmail",
                       new AttributeValue
                       {
                           S = userEmail
@@ -81,7 +81,7 @@ namespace CPT331.Carbuds.Api.Services
         {
             var putReq = new PutItemRequest()
             {
-                TableName = _config.GetValue<string>("DynamoDb:Tablenames:Booking"),
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:Bookings"),
                 Item = _utils.ToDynamoAttributeValueDictionary<Booking>(record)
             };
             var response = await _dynamoDb.PutItemAsync(putReq);
@@ -94,6 +94,7 @@ namespace CPT331.Carbuds.Api.Services
             Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
         {
         { "Uuid", new AttributeValue { S = Uuid } },
+        { "UserEmail", new AttributeValue { S = "testuser@carbuds.io" } }
         };
             GetItemRequest itemReq = new GetItemRequest()
             {
