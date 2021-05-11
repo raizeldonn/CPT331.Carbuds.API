@@ -85,7 +85,7 @@ namespace CPT331.Carbuds.Api.Controllers
                 };
             }
         }
-        [HttpGet("clientbookings{UserEmail}")]
+        [HttpGet("clientbookings/{UserEmail}")]
         public async Task<GetListBookingsResponse> GetClientBookings(string UserEmail)
         {
             try

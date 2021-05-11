@@ -105,24 +105,5 @@ namespace CPT331.Carbuds.Api.Services
       return true;
     }
 
-
-
-        //QueryRequest query = new QueryRequest()
-        //{
-        //  TableName = _config.GetValue<string>("DynamoDb:TableNames:Cars"),
-        //  ReturnConsumedCapacity = "TOTAL",
-        //  KeyConditionExpression = "CustomerId = :v_CustomerId",
-        //  ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
-        //            {
-        //                {
-        //                    ":v_CustomerId",
-        //                    new AttributeValue
-        //                    {
-        //                        S = customerId
-        //                    }
-        //                }
-        //            }
-        //};
-
     }
 }
