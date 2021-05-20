@@ -94,8 +94,7 @@ namespace CPT331.Carbuds.Api.Services
     {
       Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
         {
-        { "Uuid", new AttributeValue { S = Uuid } },
-        { "UserEmail", new AttributeValue { S = "testuser@carbuds.io" } }
+        { "Uuid", new AttributeValue { S = Uuid } }
         };
       GetItemRequest itemReq = new GetItemRequest()
       {

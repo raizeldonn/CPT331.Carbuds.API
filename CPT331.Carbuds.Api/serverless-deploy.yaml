@@ -223,8 +223,6 @@ Resources:
       KeySchema:
         - AttributeName: Uuid
           KeyType: HASH
-        - AttributeName: UserEmail
-          KeyType: RANGE
       GlobalSecondaryIndexes:
         - IndexName: UserEmailIndex
           KeySchema:
