@@ -70,7 +70,9 @@ namespace CPT331.Carbuds.Api.Services
         Name = request.Name,
         PaymentCardNumber = request.CardNumber,
         PaymentCardCvv = request.CardCvv,
-        PaymentCardExpiry = request.CardExpiry
+        PaymentCardExpiry = request.CardExpiry,
+        LicenseCountry = request.LicenseCountry,
+        LicenseNumber = request.LicenseNumber
       };
       var profileCreated = await AddUpdateUserProfile(newUserProfile);
 
