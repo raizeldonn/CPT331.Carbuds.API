@@ -46,6 +46,7 @@ namespace CPT331.Carbuds.Api
       services.AddSingleton<IParkingAllocationService, ParkingAllocationService>();
       services.AddSingleton<ICarService, CarService>();
       services.AddSingleton<IParkingLocationService, ParkingLocationService>();
+      services.AddSingleton<IBookingService, BookingService>();
 
     }
 

@@ -10,38 +10,38 @@ using System.Threading.Tasks;
 
 namespace CPT331.Carbuds.Api.Controllers
 {
-  [Route("api/[controller]")]
-  [ApiController]
-  public class ParkingLocationController : ControllerBase
-  {
-    private IParkingLocationService _parkingLocationService;
-    public ParkingLocationController(IParkingLocationService locationService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ParkingLocationController : ControllerBase
     {
-      _parkingLocationService = locationService;
-    }
-
-    [HttpPost]
-    public async Task<PostAddUpdateParkingLocationResponse> AddUpdateParkingLocation(PostAddUpdateParkingLocationRequest request)
-    {
-      try
-      {
-        return new PostAddUpdateParkingLocationResponse()
+        private IParkingLocationService _parkingLocationService;
+        public ParkingLocationController(IParkingLocationService locationService)
         {
-          Success = await _parkingLocationService.AddUpdateParkingLocation(request.Parking)
-        };
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine($"Exception encountered in POST to /api/parkingLocations: {JsonConvert.SerializeObject(e)}");
-        return new PostAddUpdateParkingLocationResponse()
-        {
-          Success = false,
-          ErrorMessage = e.Message
-        };
-      }
-    }
+            _parkingLocationService = locationService;
+        }
 
-    [HttpGet]
+        [HttpPost]
+        public async Task<PostAddUpdateParkingLocationResponse> AddUpdateParkingLocation(PostAddUpdateParkingLocationRequest request)
+        {
+            try
+            {
+                return new PostAddUpdateParkingLocationResponse()
+                {
+                    Success = await _parkingLocationService.AddUpdateParkingLocation(request.Parking)
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception encountered in POST to /api/parkingLocations: {JsonConvert.SerializeObject(e)}");
+                return new PostAddUpdateParkingLocationResponse()
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
+        [HttpGet("{locationUuid}")]
     public async Task<GetParkingLocationResponse> GetParkingLocation(string locationUuid)
     {
       try
