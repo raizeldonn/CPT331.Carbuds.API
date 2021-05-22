@@ -220,6 +220,8 @@ Resources:
           AttributeType: S
         - AttributeName: UserEmail
           AttributeType: S
+        - AttributeName: CarUuid
+          AttributeType: S
       KeySchema:
         - AttributeName: Uuid
           KeyType: HASH
@@ -227,6 +229,17 @@ Resources:
         - IndexName: UserEmailIndex
           KeySchema:
           - AttributeName: UserEmail
+            KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+            - domain
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+        - IndexName: CarUuidIndex
+          KeySchema:
+          - AttributeName: CarUuid
             KeyType: HASH
           Projection:
             NonKeyAttributes:

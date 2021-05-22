@@ -63,7 +63,7 @@ namespace CPT331.Carbuds.Api.Controllers
             }
         }
 
-        [HttpGet("getbyId{Uuid}")]
+        [HttpGet("{Uuid}")]
         public async Task<GetBookingResponse> GetBooking(string Uuid)
         {
 
@@ -85,6 +85,7 @@ namespace CPT331.Carbuds.Api.Controllers
                 };
             }
         }
+
         [HttpGet("clientbookings/{UserEmail}")]
         public async Task<GetListBookingsResponse> GetClientBookings(string UserEmail)
         {
