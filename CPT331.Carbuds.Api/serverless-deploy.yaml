@@ -68,64 +68,29 @@ Resources:
             Auth:
               Authorizer: 'NONE'
 
-
-        #------------- Cars -------------
-        CarsAddUpdateCar:
+        #------------- Bookings -------------
+        Bookings:
           Type: Api
           Properties:
-            Path: '/api/cars'
-            Method: Post
+            Path: '/api/booking/{all+}'
+            Method: ANY
             RestApiId: !Ref "CarbudsApi" 
 
-        CarsListAllCars:
+        #------------- Cars -------------
+        Cars:
           Type: Api
           Properties:
-            Path: '/api/cars/list'
-            Method: Get
-            RestApiId: !Ref "CarbudsApi"
-
-        CarsDeleteCar:
-          Type: Api
-          Properties:
-            Path: '/api/cars'
-            Method: Delete
+            Path: '/api/cars/{all+}'
+            Method: ANY
             RestApiId: !Ref "CarbudsApi" 
 
         #------------- Parking Location -------------
         ParkingLocationAddUpdateParkingLocation:
           Type: Api
           Properties:
-            Path: '/api/parkingLocation'
-            Method: Post
+            Path: '/api/parkingLocation/{all+}'
+            Method: ANY
             RestApiId: !Ref "CarbudsApi" 
-
-        ParkingLocationGetParkingLocation:
-          Type: Api
-          Properties:
-            Path: '/api/parkingLocation'
-            Method: Get
-            RestApiId: !Ref "CarbudsApi"
-
-        ParkingLocationListAllParkingLocations:
-          Type: Api
-          Properties:
-            Path: '/api/parkingLocation/list'
-            Method: Get
-            RestApiId: !Ref "CarbudsApi"
-
-        ParkingLocationListAvailableParkingLocations:
-          Type: Api
-          Properties:
-            Path: '/api/parkingLocation/list/available'
-            Method: Get
-            RestApiId: !Ref "CarbudsApi"
-
-        ParkingLocationDeleteParkingLocation:
-          Type: Api
-          Properties:
-            Path: '/api/parkingLocation'
-            Method: Delete
-            RestApiId: !Ref "CarbudsApi"
 
         #------------- User -------------
         UserSignup:
