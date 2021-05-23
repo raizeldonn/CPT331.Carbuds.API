@@ -211,7 +211,7 @@ Resources:
         WriteCapacityUnits: 2
       TableName: carbuds-parkingLocations
 
-  BookingsTable:
+  BookingsTableV2:
     Type: 'AWS::DynamoDB::Table'
     DeletionPolicy: Delete
     Properties:
@@ -226,32 +226,28 @@ Resources:
         - AttributeName: Uuid
           KeyType: HASH
       GlobalSecondaryIndexes:
-        - IndexName: UserEmailIndex
+        - IndexName: UserEmailIndexV2
           KeySchema:
           - AttributeName: UserEmail
             KeyType: HASH
           Projection:
-            NonKeyAttributes:
-            - domain
-            ProjectionType: INCLUDE
+            ProjectionType: ALL
           ProvisionedThroughput:
             ReadCapacityUnits: 1
             WriteCapacityUnits: 1
-        - IndexName: CarUuidIndex
+        - IndexName: CarUuidIndexV2
           KeySchema:
           - AttributeName: CarUuid
             KeyType: HASH
           Projection:
-            NonKeyAttributes:
-            - domain
-            ProjectionType: INCLUDE
+            ProjectionType: ALL
           ProvisionedThroughput:
             ReadCapacityUnits: 1
             WriteCapacityUnits: 1
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
-      TableName: carbuds-bookings
+      TableName: carbuds-bookings-v2
 
   CarParkingAllocationsTable:
     Type: 'AWS::DynamoDB::Table'

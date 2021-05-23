@@ -55,7 +55,7 @@ namespace CPT331.Carbuds.Api.Services
       {
         TableName = _config.GetValue<string>("DynamoDb:TableNames:Bookings"),
         ReturnConsumedCapacity = "TOTAL",
-        IndexName = "UserEmailIndex",
+        IndexName = "UserEmailIndexV2",
         KeyConditionExpression = "UserEmail = :v_UserEmail",
         ExpressionAttributeValues = new Dictionary<string, AttributeValue>()
         {
