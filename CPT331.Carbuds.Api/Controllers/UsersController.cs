@@ -62,5 +62,45 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
+
+    [HttpPost("usersignup")]
+    public async Task<PostCreateCognitoUserResponse> UserSignUp(PostCreateCognitoUserRequest request)
+    {
+      try
+      {
+        return new PostCreateCognitoUserResponse()
+        {
+          Success = await _userService.SelfServeSignUpuser(request)
+        };
+      }
+      catch (Exception e)
+      {
+        return new PostCreateCognitoUserResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
+
+    [HttpPost("verify")]
+    public async Task<PostVerifyUserResponse> VerifyUser(PostVerifyUserRequest request)
+    {
+      try
+      {
+        return new PostVerifyUserResponse()
+        {
+          Success = await _userService.VerifyCognitoUser(request)
+        };
+      }
+      catch(Exception e)
+      {
+        return new PostVerifyUserResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
   }
 }

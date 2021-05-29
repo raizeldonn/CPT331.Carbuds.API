@@ -96,7 +96,16 @@ Resources:
         UserSignup:
           Type: Api
           Properties:
-            Path: '/api/user/signup'
+            Path: '/api/user/usersignup'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+            Auth:
+              Authorizer: 'NONE'
+
+        UserVerify:
+          Type: Api
+          Properties:
+            Path: '/api/user/verify'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
             Auth:
