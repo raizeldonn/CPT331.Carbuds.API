@@ -21,7 +21,7 @@ namespace CPT331.Carbuds.Api.Controllers
       _userService = userService;
     }
 
-    [HttpGet("{email}")]
+    [HttpGet("info")]
     public async Task<GetUserResponse> GetUserInfo(string email)
     {
         try
