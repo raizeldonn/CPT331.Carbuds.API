@@ -29,7 +29,8 @@ namespace CPT331.Carbuds.Api.Controllers
             return new GetUserResponse()
             {
                 Success = true,
-                User = await _userService.GetUserInfo(email)
+                User = await _userService.GetUserInfo(email),
+                UserActive = await _userService.GetCognitoUserActivatedStatus(email)
             };
         }
         catch (Exception e)
@@ -41,6 +42,27 @@ namespace CPT331.Carbuds.Api.Controllers
                 ErrorMessage = e.Message
             };
         }
+    }
+
+    [HttpGet("list")]
+    public async Task<GetListUsersResponse> ListUsers()
+    {
+      try
+      {
+        return new GetListUsersResponse()
+        {
+          Success = true,
+          Users = await _userService.ListUsers()
+        };
+      }
+      catch(Exception e)
+      {
+        return new GetListUsersResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
     }
 
     [HttpPost("signup")]

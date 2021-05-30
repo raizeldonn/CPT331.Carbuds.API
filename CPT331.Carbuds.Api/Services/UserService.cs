@@ -15,9 +15,11 @@ namespace CPT331.Carbuds.Api.Services
   public interface IUserService
   {
     Task<bool> CreateCognitoUser(PostCreateCognitoUserRequest request);
+    Task<List<UserProfile>> ListUsers();
     Task<bool> SelfServeSignUpuser(PostCreateCognitoUserRequest request);
     Task<bool> VerifyCognitoUser(PostVerifyUserRequest request);
     Task<UserProfile> GetUserInfo(string userId);
+    Task<bool> GetCognitoUserActivatedStatus(string userEmail);
   }
 
   public class UserService : IUserService
@@ -81,6 +83,23 @@ namespace CPT331.Carbuds.Api.Services
       var profileCreated = await AddUpdateUserProfile(newUserProfile);
 
       return true;
+    }
+
+    public async Task<List<UserProfile>> ListUsers()
+    {
+      var profileList = new List<UserProfile>();
+      ScanRequest scanReq = new ScanRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:UserProfiles")
+      };
+
+      var dbResult = await _dynamoDb.ScanAsync(scanReq);
+      foreach (var item in dbResult.Items)
+      {
+        profileList.Add(_utils.ToObjectFromDynamoResult<UserProfile>(item));
+      }
+
+      return profileList;
     }
 
     public async Task<bool> SelfServeSignUpuser(PostCreateCognitoUserRequest request)
@@ -164,9 +183,9 @@ namespace CPT331.Carbuds.Api.Services
     public async Task<UserProfile> GetUserInfo(string userEmail)
     {
       Dictionary<string, AttributeValue> key = new Dictionary<string, AttributeValue>
-            {
-            { "Email", new AttributeValue { S = userEmail } },
-            };
+      {
+        { "Email", new AttributeValue { S = userEmail } },
+      };
       GetItemRequest itemReq = new GetItemRequest()
       {
         TableName = _config.GetValue<string>("DynamoDb:Tablenames:UserProfiles"),
@@ -176,6 +195,19 @@ namespace CPT331.Carbuds.Api.Services
       var user = _utils.ToObjectFromDynamoResult<UserProfile>(dbResult.Item);
 
       return user;
+    }
+
+    public async Task<bool> GetCognitoUserActivatedStatus(string userEmail)
+    {
+      AdminGetUserRequest req = new AdminGetUserRequest()
+      {
+        UserPoolId = _config.GetValue<string>("Cognito:UserPoolId"),
+        Username = userEmail
+      };
+
+      var getUserResp = await _cognito.AdminGetUserAsync(req);
+
+      return getUserResp.Enabled;
     }
   }
 }

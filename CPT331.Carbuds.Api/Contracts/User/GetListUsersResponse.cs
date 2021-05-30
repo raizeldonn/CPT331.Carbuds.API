@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace CPT331.Carbuds.Api.Contracts.User
 {
-  public class GetUserResponse: BaseResponse
+  public class GetListUsersResponse: BaseResponse
   {
-    public UserProfile User { get; set; }
-    public bool UserActive { get; set; }
+    public List<UserProfile> Users { get; set; }
   }
 }
