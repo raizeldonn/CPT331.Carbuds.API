@@ -124,5 +124,25 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
+
+    [HttpPost("accountStatus")]
+    public async Task<PostUpdateUserStatusResponse> UpdateUserAccountStatus(PostUpdateUserStatusRequest request)
+    {
+      try
+      {
+        return new PostUpdateUserStatusResponse()
+        {
+          Success = await _userService.UpdateCognitoUserStatus(request.UserEmail, request.AccountEnabled)
+        };
+      }
+      catch(Exception e)
+      {
+        return new PostUpdateUserStatusResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
+    }
   }
 }

@@ -20,6 +20,7 @@ namespace CPT331.Carbuds.Api.Services
     Task<bool> VerifyCognitoUser(PostVerifyUserRequest request);
     Task<UserProfile> GetUserInfo(string userId);
     Task<bool> GetCognitoUserActivatedStatus(string userEmail);
+    Task<bool> UpdateCognitoUserStatus(string userEmail, bool accountEnabled);
   }
 
   public class UserService : IUserService
@@ -209,5 +210,30 @@ namespace CPT331.Carbuds.Api.Services
 
       return getUserResp.Enabled;
     }
+
+    public async Task<bool> UpdateCognitoUserStatus(string userEmail, bool accountEnabled)
+    {
+      if (!accountEnabled)
+      {
+        AdminDisableUserRequest req = new AdminDisableUserRequest()
+        {
+          Username = userEmail,
+          UserPoolId = _config.GetValue<string>("Cognito:UserPoolId")
+        };
+        var opComplete = await _cognito.AdminDisableUserAsync(req);
+      }
+      else
+      {
+        AdminEnableUserRequest req = new AdminEnableUserRequest()
+        {
+          Username = userEmail,
+          UserPoolId = _config.GetValue<string>("Cognito:UserPoolId")
+        };
+        var opComplete = await _cognito.AdminEnableUserAsync(req);
+      }
+
+      return true;
+    }
+
   }
 }
