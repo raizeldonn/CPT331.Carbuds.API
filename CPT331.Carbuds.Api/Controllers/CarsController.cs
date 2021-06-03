@@ -104,6 +104,27 @@ namespace CPT331.Carbuds.Api.Controllers
                 };
             }
         }
+        [HttpGet("supportedCars")]
+        public async Task<GetSupportedCarsResponse> getSupportedCars()
+        {
+            try
+            {
+                return new GetSupportedCarsResponse()
+                {
+                    Success = true,
+                    SupportedCars = await _carService.GetSupportedCars()
+                };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception encountered in GET to /api/cars/supportedCars: {JsonConvert.SerializeObject(e)}");
+                return new GetSupportedCarsResponse()
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
     }
 
 }
