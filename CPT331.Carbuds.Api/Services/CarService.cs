@@ -16,7 +16,8 @@ namespace CPT331.Carbuds.Api.Services
     Task<bool> AddUpdateCar(Car record);
     Task<Car> GetCar(string Uuid);
     Task<bool> DeleteCar(string carUuid);
-  }
+    Task<List<CarModels>> GetSupportedCars();
+    }
 
   public class CarService: ICarService
   {
@@ -104,6 +105,23 @@ namespace CPT331.Carbuds.Api.Services
       var response = await _dynamoDb.DeleteItemAsync(delReq);
       return true;
     }
+
+        public async Task<List<CarModels>> GetSupportedCars()
+        {
+            var carModelList = new List<CarModels>();
+            ScanRequest scanReq = new ScanRequest()
+            {
+                TableName = _config.GetValue<string>("DynamoDb:Tablenames:CarModels")
+            };
+
+            var dbResult = await _dynamoDb.ScanAsync(scanReq);
+            foreach (var item in dbResult.Items)
+            {
+                carModelList.Add(_utils.ToObjectFromDynamoResult<CarModels>(item));
+            }
+
+            return carModelList;
+        }
 
     }
 }
