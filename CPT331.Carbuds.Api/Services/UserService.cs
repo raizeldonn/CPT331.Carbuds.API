@@ -21,6 +21,7 @@ namespace CPT331.Carbuds.Api.Services
     Task<UserProfile> GetUserInfo(string userId);
     Task<bool> GetCognitoUserActivatedStatus(string userEmail);
     Task<bool> UpdateCognitoUserStatus(string userEmail, bool accountEnabled);
+    Task<bool> SetCognitoUserPassword(string userEmail, string newPassword);
   }
 
   public class UserService : IUserService
