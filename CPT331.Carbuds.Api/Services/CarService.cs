@@ -95,14 +95,29 @@ namespace CPT331.Carbuds.Api.Services
 
     public async Task<bool> DeleteCar(string carUuid)
     {
-      var delReq = new DeleteItemRequest()
+      
+      var delCarReq = new DeleteItemRequest()
       {
         TableName = _config.GetValue<string>("DynamoDb:Tablenames:Cars"),
         Key = new Dictionary<string, AttributeValue>() {
             { "Uuid", new AttributeValue { S = carUuid } },
         }
       };
-      var response = await _dynamoDb.DeleteItemAsync(delReq);
+
+      var existingParkingAllocation = await _plService.GetParkingAllocationByCar(carUuid);
+      
+      var delPlAllocationReq = new DeleteItemRequest()
+      {
+        TableName = _config.GetValue<string>("DynamoDb:Tablenames:CarParkingAllocations"),
+        Key = new Dictionary<string, AttributeValue>() {
+            { "CarUuid", new AttributeValue { S = existingParkingAllocation.CarUuid } },
+            { "LocationUuid", new AttributeValue { S = existingParkingAllocation.LocationUuid } },
+        }
+      };
+
+      var plAllocationDeleted = await _dynamoDb.DeleteItemAsync(delPlAllocationReq);
+      var carDeleted = await _dynamoDb.DeleteItemAsync(delCarReq);
+
       return true;
     }
 
