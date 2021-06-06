@@ -96,35 +96,35 @@ Resources:
         UserGetUserInfo:
           Type: Api
           Properties:
-            Path: '/api/user/info'
+            Path: '/api/users/info'
             Method: Get
             RestApiId: !Ref "CarbudsApi" 
 
         UserGetUserList:
           Type: Api
           Properties:
-            Path: '/api/user/list'
+            Path: '/api/users/list'
             Method: Get
             RestApiId: !Ref "CarbudsApi" 
 
         UserUpdateUserAccountStatus:
           Type: Api
           Properties:
-            Path: '/api/user/accountStatus'
+            Path: '/api/users/accountStatus'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
 
         UserResetUserPassword:
           Type: Api
           Properties:
-            Path: '/api/user/resetPassword'
+            Path: '/api/users/resetPassword'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
         
         UserSignup:
           Type: Api
           Properties:
-            Path: '/api/user/usersignup'
+            Path: '/api/users/usersignup'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
             Auth:
@@ -133,7 +133,7 @@ Resources:
         UserVerify:
           Type: Api
           Properties:
-            Path: '/api/user/verify'
+            Path: '/api/users/verify'
             Method: Post
             RestApiId: !Ref "CarbudsApi" 
             Auth:
