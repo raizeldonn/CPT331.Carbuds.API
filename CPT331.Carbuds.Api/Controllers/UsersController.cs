@@ -15,7 +15,7 @@ namespace CPT331.Carbuds.Api.Controllers
   public class UsersController : ControllerBase
   {
     private IUserService _userService;
-   
+
     public UsersController(IUserService userService)
     {
       _userService = userService;
@@ -24,24 +24,24 @@ namespace CPT331.Carbuds.Api.Controllers
     [HttpGet("info")]
     public async Task<GetUserResponse> GetUserInfo(string email)
     {
-        try
+      try
+      {
+        return new GetUserResponse()
         {
-            return new GetUserResponse()
-            {
-                Success = true,
-                User = await _userService.GetUserInfo(email),
-                UserActive = await _userService.GetCognitoUserActivatedStatus(email)
-            };
-        }
-        catch (Exception e)
+          Success = true,
+          User = await _userService.GetUserInfo(email),
+          UserActive = await _userService.GetCognitoUserActivatedStatus(email)
+        };
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine($"Exception encountered in GET to /api/user/userInfo: {JsonConvert.SerializeObject(e)}");
+        return new GetUserResponse()
         {
-            Console.WriteLine($"Exception encountered in GET to /api/user/userInfo: {JsonConvert.SerializeObject(e)}");
-            return new GetUserResponse()
-            {
-                Success = false,
-                ErrorMessage = e.Message
-            };
-        }
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
     }
 
     [HttpGet("list")]
@@ -55,7 +55,7 @@ namespace CPT331.Carbuds.Api.Controllers
           Users = await _userService.ListUsers()
         };
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         return new GetListUsersResponse()
         {
@@ -75,7 +75,7 @@ namespace CPT331.Carbuds.Api.Controllers
           Success = await _userService.CreateCognitoUser(request)
         };
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         return new PostCreateCognitoUserResponse()
         {
@@ -115,7 +115,7 @@ namespace CPT331.Carbuds.Api.Controllers
           Success = await _userService.VerifyCognitoUser(request)
         };
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         return new PostVerifyUserResponse()
         {
@@ -135,7 +135,7 @@ namespace CPT331.Carbuds.Api.Controllers
           Success = await _userService.UpdateCognitoUserStatus(request.UserEmail, request.AccountEnabled)
         };
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         return new PostUpdateUserStatusResponse()
         {
@@ -145,25 +145,25 @@ namespace CPT331.Carbuds.Api.Controllers
       }
     }
 
-        [HttpPost("resetPassword")]
-        public async Task<PostResetUserPasswordResponse> ResetUserPassword(PostResetUserPasswordRequest request)
+    [HttpPost("resetPassword")]
+    public async Task<PostResetUserPasswordResponse> ResetUserPassword(PostResetUserPasswordRequest request)
+    {
+      try
+      {
+        return new PostResetUserPasswordResponse()
         {
-            try
-            {
-                return new PostResetUserPasswordResponse()
-                {
-                    Success = await _userService.SetCognitoUserPassword(request.UserEmail, request.UserPassword)
-                };
-            }
-            catch (Exception e)
-            {
-                return new PostResetUserPasswordResponse()
-                {
-                    Success = false,
-                    ErrorMessage = e.Message
-                };
-            }
-        }
-
+          Success = await _userService.SetCognitoUserPassword(request.UserEmail, request.UserPassword)
+        };
+      }
+      catch (Exception e)
+      {
+        return new PostResetUserPasswordResponse()
+        {
+          Success = false,
+          ErrorMessage = e.Message
+        };
+      }
     }
+
+  }
 }
