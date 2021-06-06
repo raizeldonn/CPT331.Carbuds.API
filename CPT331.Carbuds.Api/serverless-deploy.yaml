@@ -93,6 +93,34 @@ Resources:
             RestApiId: !Ref "CarbudsApi" 
 
         #------------- User -------------
+        UserGetUserInfo:
+          Type: Api
+          Properties:
+            Path: '/api/user/info'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi" 
+
+        UserGetUserList:
+          Type: Api
+          Properties:
+            Path: '/api/user/list'
+            Method: Get
+            RestApiId: !Ref "CarbudsApi" 
+
+        UserUpdateUserAccountStatus:
+          Type: Api
+          Properties:
+            Path: '/api/user/accountStatus'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+
+        UserResetUserPassword:
+          Type: Api
+          Properties:
+            Path: '/api/user/resetPassword'
+            Method: Post
+            RestApiId: !Ref "CarbudsApi" 
+        
         UserSignup:
           Type: Api
           Properties:
@@ -110,6 +138,7 @@ Resources:
             RestApiId: !Ref "CarbudsApi" 
             Auth:
               Authorizer: 'NONE'
+
 
   # ---------------- DYNAMO TABLE DEFINITIONS ----------------
   
