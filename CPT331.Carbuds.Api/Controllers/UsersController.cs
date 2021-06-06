@@ -144,5 +144,26 @@ namespace CPT331.Carbuds.Api.Controllers
         };
       }
     }
-  }
+
+        [HttpPost("resetPassword")]
+        public async Task<PostResetUserPasswordResponse> ResetUserPassword(PostResetUserPasswordRequest request)
+        {
+            try
+            {
+                return new PostResetUserPasswordResponse()
+                {
+                    Success = await _userService.SetCognitoUserPassword(request.UserEmail, request.UserPassword)
+                };
+            }
+            catch (Exception e)
+            {
+                return new PostResetUserPasswordResponse()
+                {
+                    Success = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
+    }
 }
